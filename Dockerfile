@@ -1,35 +1,42 @@
-# Use official Python base image
+# Use the official Python image as base
 FROM python:3.14-slim
-
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-# Set work directory
-WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
+    gcc \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy uv installation script and install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+# Create a non-root user and group
+ARG APP_USER=appuser
+ARG APP_UID=1000
+ARG APP_GID=1000
 
-# Copy project requirements and install dependencies with uv
-COPY pyproject.toml uv.lock ./
-RUN uv pip install --system --no-cache-dir -r uv.lock
+RUN groupadd --gid ${APP_GID} ${APP_USER} \
+    && useradd --uid ${APP_UID} --gid ${APP_GID} --shell /usr/sbin/nologin --create-home ${APP_USER}
 
-# Copy project
-COPY . .
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/home/${APP_USER}/.local/bin:$PATH"
 
-# Create non-root user
-RUN adduser --disabled-password --gecos '' appuser && \
-    chown -R appuser:appuser /app
-USER appuser
+# Set work directory and adjust ownership
+WORKDIR /usr/app
+RUN chown -R ${APP_USER}:${APP_USER} /usr/app
+
+# Copy uv configuration files
+COPY --chown=${APP_USER}:${APP_USER} pyproject.toml uv.lock ./
+
+# Install uv and dependencies as non-root user
+USER ${APP_USER}
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN uv sync --frozen --no-dev
+
+# Copy application code
+COPY --chown=${APP_USER}:${APP_USER} . .
 
 # Expose port
 EXPOSE 8000
 
-# Run the application with WSGI using uv
+# Run the application with Gunicorn
 CMD ["uv", "run", "gunicorn", "--bind", "0.0.0.0:8000", "core.wsgi:application"]
