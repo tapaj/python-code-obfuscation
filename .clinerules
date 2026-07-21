@@ -1,0 +1,58 @@
+# Project Architecture and Coding Standards
+
+## Project Overview
+This is a Django web application project named "python-code-obfuscation" designed for code obfuscation functionality. The project follows standard Django architecture patterns.
+
+## Core Tech Stack
+- **Framework**: Django 6.0.7
+- **Database**: SQLite (default configuration)
+- **Python Version**: >=3.14
+- **Package Management**: pyproject.toml (modern Python packaging)
+- **Deployment**: WSGI/ASGI configuration included
+
+## Project Structure
+```
+.
+├── manage.py                 # Django command-line utility
+├── pyproject.toml           # Project metadata and dependencies
+├── README.md                # Project documentation (empty in current state)
+├── core/                    # Main Django project directory
+│   ├── __init__.py          # Python package initializer
+│   ├── settings.py          # Django settings configuration
+│   ├── urls.py              # URL routing configuration
+│   ├── wsgi.py              # WSGI configuration for deployment
+│   └── asgi.py              # ASGI configuration for async support
+├── db.sqlite3               # Default SQLite database
+└── .python-version          # Python version specification
+```
+
+## Configuration Files
+- `core/settings.py`: Contains all Django settings including security, middleware, apps, database, and static files configuration
+- `core/urls.py`: URL patterns routing to views
+- `pyproject.toml`: Project metadata and dependencies
+
+## Established Coding Conventions
+1. **Django Standards**: Follows standard Django project structure and conventions
+2. **Settings Configuration**: Uses Django's standard settings approach with BASE_DIR, SECRET_KEY, DEBUG=True for development
+3. **URL Routing**: Standard Django URL pattern configuration using path() function
+4. **Database**: Default SQLite setup with proper configuration in settings.py
+5. **Security**: Includes default Django security middleware and password validators
+6. **Static Files**: Standard Django static files handling configuration
+
+## Development Environment
+- DEBUG mode enabled for development
+- SQLite database configured as default
+- Admin interface accessible at `/admin/`
+- Standard Django app structure with contrib apps included (admin, auth, sessions, etc.)
+
+## Next Steps for Implementation
+1. Create custom Django apps for obfuscation functionality
+2. Implement models for code storage and obfuscation settings
+3. Develop views and templates for user interaction
+4. Add actual code obfuscation logic
+5. Configure additional security measures as needed
+
+## Notes
+- The project currently only has basic Django framework setup
+- No custom apps or obfuscation functionality implemented yet
+- Database is configured to use SQLite for development purposes
